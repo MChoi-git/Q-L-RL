@@ -43,6 +43,7 @@ def get_best_action(maze):
         for j in range(x_maze_bound + 1):
             if maze[i][j] == 0:
                 goal_coord += [i, j]
+            # Check all edge cases
             if not np.isnan(maze[i][j]):
                 if i == 0 and j != 0 and j != x_maze_bound:  # Top wall
                     max_action = np.nanmax(np.array([maze[i][j + 1], maze[i - 1][j], maze[i][j - 1]]))
@@ -70,16 +71,24 @@ def get_best_action(maze):
 
 
 def value_it(maze, num_epochs, discount_factor):
+    """ Calculates array containing values resulting from the value iteration algorithm
+
+    :param maze:
+    :param num_epochs:
+    :param discount_factor:
+    :return:
+    """
     maze_rounds = []
+    # First epoch
     best_actions = get_best_action(maze)
     current_maze = maze + discount_factor * best_actions
     maze_rounds.append(current_maze)
-    prev_best_actions = best_actions
-    original_best_actions = best_actions
+    prev_best_actions = best_actions        # This changes with epoch, and allows comparison for creating mask
+    original_best_actions = best_actions    # This doesn't change with epoch, is used to keep value addition constant
     for t in range(1, num_epochs):
         best_actions = get_best_action(current_maze)
-        actions_array_mask = np.equal(prev_best_actions, best_actions)
-        current_maze = current_maze + (~actions_array_mask * (discount_factor ** (t + 1)) * original_best_actions)
+        actions_array_mask = np.equal(prev_best_actions, best_actions)  # Create mask which maps the values to be updated
+        current_maze = current_maze + (~actions_array_mask * (discount_factor ** (t + 1)) * original_best_actions)  # Discount factor compounds w/ time
         maze_rounds.append(current_maze)
         prev_best_actions = best_actions
     return current_maze
