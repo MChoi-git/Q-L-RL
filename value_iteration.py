@@ -8,7 +8,7 @@ import pandas as pd
 
 
 def init_maze_values(maze_input):
-    """ Initializes the maze file into an np array of floats. Fixed for use in q-learning for now.
+    """Initializes the maze file into an np array of floats. Fixed for use in q-learning for now.
 
     :param maze_input: Path to maze file
     :return: Array of floats
@@ -28,7 +28,7 @@ def init_maze_values(maze_input):
 
 
 def get_best_action(maze):
-    """ Gets a list of the best actions in four directions without diagonals, within a radius of one. Places the max action value back inside
+    """Gets a list of the best actions in four directions without diagonals, within a radius of one. Places the max action value back inside
         the reference index. Therefore, the returned array is the same shape as the input maze.
 
     :param maze: Maze value array
@@ -71,7 +71,7 @@ def get_best_action(maze):
 
 
 def directional_sweep(maze, discount_factor):
-    """ Same as get_best_action(), but does not calculate the max of the directions within a radius of 1. Instead, the potential
+    """Same as get_best_action(), but does not calculate the max of the directions within a radius of 1. Instead, the potential
         actions are saved. Intuitively, this function saves all actions a at all states s, filling the sets A and S for Q value
         population. This is basically repeat code, but this is necessary in this assignment.
 
@@ -124,7 +124,7 @@ def directional_sweep(maze, discount_factor):
 
 
 def value_it(maze, num_epochs, discount_factor):
-    """ Calculates array containing values resulting from the value iteration algorithm
+    """Calculates array containing values resulting from the value iteration algorithm
 
     :param maze: Initialized value maze
     :param num_epochs: Number of epochs to continue value iteration
@@ -161,7 +161,7 @@ def q_values(maze, discount_factor):
 
 
 def values_to_txt(filename, value_maze):
-    """ Converts the value maze into a text file, of the format <i j value>
+    """Converts the value maze into a text file, of the format <i j value>
 
     :param filename: Path to file
     :param value_maze: Maze value array
