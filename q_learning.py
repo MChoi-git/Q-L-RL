@@ -37,18 +37,29 @@ def get_optimal_action(q_table, environment):
     return max_action
 
 
+def update_q_table(q_table, state, action, reward, next_state):
+    return
+
+
 def main():
     # Retrieve command line args
     maze_input, value_file, q_value_file, policy_file, num_episodes, max_episode_length, learning_rate, discount_factor, epsilon = sys.argv[1:]
     # Initialize the environment
     environment = env.Environment(maze_input)
     q_table = init_q_table(environment)
-    get_optimal_action(q_table, environment)
-    # for episode in range(int(num_episodes)):
-    #     for episode_action in range(int(max_episode_length)):
-    #         # With probability 1 - epsilon, be exploitative
-    #         if random.random() >= 1 - float(epsilon):
-
+    for episode in range(int(num_episodes)):
+        for episode_action in range(int(max_episode_length)):
+            # Exploit
+            if random.random() >= 1 - float(epsilon):
+                next_action = get_optimal_action(q_table, environment)
+            # Explore
+            else:
+                next_action = random.randint(0, 3)
+            # Retrieve <s, a, r, s'> tuple
+            current_state = environment.agent_location
+            next_state, reward, is_terminal = environment.step(next_action)
+            # Update Q table with new tuple
+            update_q_table(current_state, next_action, reward, next_state)
     return
 
 
