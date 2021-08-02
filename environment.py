@@ -10,8 +10,9 @@ class Environment:
     def __init__(self, maze_filename):
         self.maze_filename = maze_filename
         self.maze = vi.init_maze_values(maze_filename)
-        self.agent_location = np.concatenate(np.where(self.maze == -2))
+        self.start_location = np.concatenate(np.where(self.maze == -2))
         self.maze = np.where(self.maze == -2, -1, self.maze)
+        self.agent_location = self.start_location
 
     def is_terminal(self, next_state):
         """Checks if agents next state s' is the terminal (goal) state.
@@ -53,6 +54,11 @@ class Environment:
         """
         reward, is_terminal, next_state = self.process_movement(action)
         print(f"Next state properties: <{next_state}, {reward}, {int(is_terminal)}>")
+        return [next_state, reward, int(is_terminal)]
+
+    def reset(self):
+        self.agent_location = self.start_location
+        return self.agent_location
 
 
 def init_action_seq_file(actions_file):
@@ -65,13 +71,29 @@ def init_action_seq_file(actions_file):
     return action_seq
 
 
-# Retrieve command-line args
-maze_input, output_file, action_seq_file = sys.argv[1:]
-# Initialize the environment
-environment = Environment(maze_input)
-# Initialize the action sequence array
-actions = init_action_seq_file(action_seq_file)
-# Agent moves in the direction of each action
-for i in actions:
-    environment.step(i)
+def write_output_file(filename, output):
+    """Writes the output to file.
 
+    :param filename: Path to output file
+    :param output: Action sequence array
+    :return: Nothing
+    """
+    with open(filename, "w") as f:
+        for i in range(len(output)):
+            f.writelines(output[i] )
+
+
+# # Retrieve command-line args
+# maze_input, output_file, action_seq_file = sys.argv[1:]
+# # Initialize the environment
+# environment = Environment(maze_input)
+# # Initialize the action sequence array
+# actions = init_action_seq_file(action_seq_file)
+# # Agent moves in the direction of each action
+# f_strings = []
+# for i in actions:
+#     next_state, reward, is_terminal = environment.step(i)
+#     f_strings.append([f"{next_state[0]} {next_state[1]} {reward} {is_terminal}\n"])
+# # Save action
+# write_output_file(output_file, f_strings)
+# print(environment.maze)
