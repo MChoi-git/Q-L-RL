@@ -47,7 +47,7 @@ def main():
     # Initialize the environment
     environment = env.Environment(maze_input)
     q_table = init_q_table(environment)
-    for episode in range(int(num_episodes)):
+    for episode in range(int(num_episodes)):  # int(num_episodes)
         for episode_action in range(int(max_episode_length)):
             # Exploit
             if random.random() >= 1 - float(epsilon):
@@ -56,10 +56,18 @@ def main():
             else:
                 next_action = random.randint(0, 3)
             # Retrieve <s, a, r, s'> tuple
-            current_state = environment.agent_location
+            current_state = np.array(environment.agent_location)
             next_state, reward, is_terminal = environment.step(next_action)
+            print(f"<{current_state}, {next_action}, {reward}, {next_state}>")
             # Update Q table with new tuple
-            update_q_table(current_state, next_action, reward, next_state)
+            update_q_table(q_table, current_state, next_action, reward, next_state)
+            # Check if agent has reached the terminal state
+            if is_terminal:
+                print("Found the end.")
+                break
+            elif episode_action == int(max_episode_length) - 1:
+                print("Did not find the end.")
+
     return
 
 

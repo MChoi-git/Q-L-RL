@@ -32,18 +32,26 @@ class Environment:
         :return: The corresponding reward value for moving to the next state, boolean denoting if the next state is terminal, and
                  the coordinates of the next state
         """
-        coding = np.array([[1, -1],     # Might be a better, more readable way to do this
-                           [0, -1],
-                           [1, 1],
-                           [0, 1]])
-        code = tuple(coding[direction])
-        # Check that agent can move left
-        if self.agent_location[code[0]] + code[1] >= 0 and ~np.isnan(self.agent_location[code[0]] + code[1]):
-            self.agent_location[code[0]] += code[1]
-            reward = self.maze[tuple(self.agent_location)]
-            is_terminal = self.is_terminal(tuple(self.agent_location))
-            next_state = self.agent_location
-            return reward, is_terminal, next_state
+        coding = np.array([[0, -1],     # Might be a better, more readable way to do this
+                           [-1, 0],
+                           [0, 1],
+                           [1, 0]])
+        code = coding[direction]
+        # Check that agent can move in specified direction
+        next_location = self.agent_location + code
+        # Check that action lies within the maze
+        if next_location[next_location < 0].size == 0 and (next_location + 1 <= np.array(self.maze.shape)).all():
+            # Check that agent does not run into obstacle (separate branch to avoid array out of bounds)
+            if ~np.isnan(self.maze[tuple(next_location)]):
+                # Agent moves
+                self.agent_location += code
+                # Get updated values
+                reward = self.maze[tuple(self.agent_location)]
+                is_terminal = self.is_terminal(tuple(self.agent_location))
+                next_state = self.agent_location
+                return reward, is_terminal, next_state
+            else:
+                return -1.0, False, self.agent_location
         else:
             return -1.0, False, self.agent_location
 
@@ -53,7 +61,7 @@ class Environment:
         :param action: The action the agent will take, coded as: [left, up, right, down]
         """
         reward, is_terminal, next_state = self.process_movement(action)
-        print(f"Next state properties: <{next_state}, {reward}, {int(is_terminal)}>")
+        # print(f"Next state properties: <{next_state}, {reward}, {int(is_terminal)}>")
         return [next_state, reward, int(is_terminal)]
 
     def reset(self):
