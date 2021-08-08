@@ -1,6 +1,6 @@
 import numpy as np
 import value_iteration as vi
-import sys
+# import sys
 
 
 class Environment:
@@ -9,10 +9,9 @@ class Environment:
     """
     def __init__(self, maze_filename):
         self.maze_filename = maze_filename
-        self.maze = vi.init_maze_values(maze_filename)
-        self.start_location = np.concatenate(np.where(self.maze == -2))
-        self.maze = np.where(self.maze == -2, -1, self.maze)
-        self.agent_location = self.start_location
+        self.ref_maze = vi.init_maze_values(maze_filename)
+        self.agent_location = np.concatenate(np.where(self.ref_maze == -2))
+        self.maze = np.where(self.ref_maze == -2, -1, self.ref_maze)
 
     def is_terminal(self, next_state):
         """Checks if agents next state s' is the terminal (goal) state.
@@ -37,19 +36,22 @@ class Environment:
                            [0, 1],
                            [1, 0]])
         code = coding[direction]
+
         # Check that agent can move in specified direction
         next_location = self.agent_location + code
+
         # Check that action lies within the maze
         if next_location[next_location < 0].size == 0 and (next_location + 1 <= np.array(self.maze.shape)).all():
+
             # Check that agent does not run into obstacle (separate branch to avoid array out of bounds)
             if ~np.isnan(self.maze[tuple(next_location)]):
+
                 # Agent moves
                 self.agent_location += code
-                # Get updated values
-                reward = self.maze[tuple(self.agent_location)]
                 is_terminal = self.is_terminal(tuple(self.agent_location))
                 next_state = self.agent_location
-                return reward, is_terminal, next_state
+
+                return -1.0, is_terminal, next_state
             else:
                 return -1.0, False, self.agent_location
         else:
@@ -61,12 +63,10 @@ class Environment:
         :param action: The action the agent will take, coded as: [left, up, right, down]
         """
         reward, is_terminal, next_state = self.process_movement(action)
-        # print(f"Next state properties: <{next_state}, {reward}, {int(is_terminal)}>")
         return [next_state, reward, int(is_terminal)]
 
     def reset(self):
-        self.agent_location = self.start_location
-        return self.agent_location
+        self.agent_location = np.concatenate(np.where(self.ref_maze == -2))
 
 
 def init_action_seq_file(actions_file):
@@ -88,7 +88,7 @@ def write_output_file(filename, output):
     """
     with open(filename, "w") as f:
         for i in range(len(output)):
-            f.writelines(output[i] )
+            f.writelines(output[i])
 
 
 # # Retrieve command-line args
